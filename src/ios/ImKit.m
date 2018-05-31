@@ -78,64 +78,23 @@
         }
     }
     
-- (void)Connect:(CDVInvokedUrlCommand *)command
-    {
-        //2
-        NSLog(@"%s", __FUNCTION__);
-        NSString *imtoken = [command argumentAtIndex:0 withDefault:nil];
-        NSString *htoken = [command argumentAtIndex:1 withDefault:nil];
-        NSString *userUrl = [command argumentAtIndex:2 withDefault:nil];
-        [_rongimUtls connect:htoken andImToken:imtoken andGetUserUrl:userUrl success:^(NSString *content) {
-            CDVPluginResult *pluginResult=nil;
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        }];
-        
-    }
-    
-- (void)LaunchChats:(CDVInvokedUrlCommand *)command {
-    bcmd = command;
-    [_rongimUtls launchChats: backFunc];
-}
-    
-- (void)LaunchChat:(CDVInvokedUrlCommand *)command {
-    bcmd = command;
-    NSString *userId = [command argumentAtIndex:0 withDefault:nil];
-    [_rongimUtls launchChat:userId success: backFunc];
-}
-
-- (void)LaunchSystem:(CDVInvokedUrlCommand *)command {
-    bcmd = command;
-    NSString *userId = [command argumentAtIndex:0 withDefault:nil];
-    [_rongimUtls launchSystem:userId success: backFunc];
-}
-    
-- (void)Exit:(CDVInvokedUrlCommand *)command {
-    [_rongimUtls exit];
-}
-    
-- (void)GetUserInfo:(CDVInvokedUrlCommand *)command {
-    NSString *userId = [command argumentAtIndex:0 withDefault:nil];
-    [_rongimUtls getUserInfo:userId success:^(NSString *content) {
+- (void)Connect:(CDVInvokedUrlCommand *)command {
+    NSString *imtoken = [command argumentAtIndex:0 withDefault:nil];
+    NSString *htoken = [command argumentAtIndex:1 withDefault:nil];
+    NSString *userUrl = [command argumentAtIndex:2 withDefault:nil];
+    [_rongimUtls connect:htoken andImToken:imtoken andGetUserUrl:userUrl success:^(NSString *content) {
         CDVPluginResult *pluginResult=nil;
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
+    
 }
     
-- (void)GetConversationList:(CDVInvokedUrlCommand *)command {
-    [_rongimUtls getConversationList:^(NSString *content) {
-        CDVPluginResult *pluginResult=nil;
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+
+- (void)LaunchCustomer:(CDVInvokedUrlCommand *)command {
+    bcmd = command;
+    NSString *userId = [command argumentAtIndex:0 withDefault:nil];
+    [_rongimUtls LaunchCustomer:userId success: backFunc];
 }
 
-- (void)RemoveConversation:(CDVInvokedUrlCommand *)command {
-	NSString *userId = [command argumentAtIndex:0 withDefault:nil];
-	NSString *type = [command argumentAtIndex:1 withDefault:nil];
-    int conversationType = [type intValue];
-    [_rongimUtls removeConversation:conversationType addUserId:userId];
-}
-    
 @end

@@ -21,27 +21,19 @@ import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.UserInfo;
 import io.rong.message.TextMessage;
 import org.apache.cordova.*;
-
+import io.rong.imlib.model.CSCustomServiceInfo;
 
 /**
  * Created by jazzeZhou on 16/11/17.
  */
 public class BaseUtils {
-    
-    public static CallbackContext chatCallbackContext = null;
-    public static CallbackContext chatsCallbackContext = null;
-    
+
+  public static CallbackContext chatCallbackContext = null;
+  public static CallbackContext chatsCallbackContext = null;
 
   public static void init(Context context, final CallbackContext callbackContext) {
+    Log.i("BaseUtils", "init");
     RongIM.init(context);
-    RongIM.setUserInfoProvider(new RongIM.UserInfoProvider() {
-
-      @Override
-      public UserInfo getUserInfo(String userId) {
-        return HttpUtils.getInstance().getUserInfo(userId);//根据 userId 去你的用户系统里查询对应的用户信息返回给融云 SDK。
-      }
-
-    }, true);
     RongIM.setOnReceiveMessageListener(new RongIMClient.OnReceiveMessageListener() {
       @Override
       public boolean onReceived(Message message, int i) {
@@ -55,7 +47,6 @@ public class BaseUtils {
         }
         im.lastTime = message.getReceivedTime();
         String content = JSON.toJSONString(im);
-        Log.i("BaseUtils","content:"+content);
         PluginResult pr = new PluginResult(PluginResult.Status.OK, content);
         pr.setKeepCallback(true);
         callbackContext.sendPluginResult(pr);
@@ -64,15 +55,8 @@ public class BaseUtils {
     });
   }
 
-  public static void getUserInfo(String userId, final CallbackContext callbackContext) {
-    String userInfo = HttpUtils.getInstance().getHUserInfo(userId);
-    callbackContext.success(userInfo);
-  }
-
-  public static void connect(final Context context, String token, String h_token, String url, final CallbackContext callbackContext) {
+  public static void connect(final Context context, String token, final CallbackContext callbackContext) {
     RongIM.getInstance().logout();
-    HttpUtils.setBaseurl(url);
-    HttpUtils.getInstance().setToken(h_token);
     RongIM.connect(token, new RongIMClient.ConnectCallback() {
       @Override
       public void onTokenIncorrect() {
@@ -82,14 +66,6 @@ public class BaseUtils {
       @Override
       public void onSuccess(String s) {
         Log.i("connect", "onSuccess:" + s);
-        final String userId = s;
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            UserInfo userInfo = HttpUtils.getUserInfo(userId);
-            RongIM.getInstance().refreshUserInfoCache(userInfo);
-          }
-        }).start();
         callbackContext.success("");
       }
 
@@ -101,62 +77,13 @@ public class BaseUtils {
 
   }
 
-  public static void getConversationList(final CallbackContext callbackContext) {
-    RongIMClient.getInstance().getConversationList(new RongIMClient.ResultCallback<List<Conversation>>() {
-      @Override
-      public void onSuccess(List<Conversation> conversations) {
-        List<ImMessage> list = new ArrayList<ImMessage>();
-        if (conversations != null) {
-          for (Conversation item: conversations) {
-            ImMessage im = new ImMessage();
-            im.id = item.getTargetId();
-            im.conversationType = item.getConversationType().getValue();
-            im.type = item.getObjectName();
-            im.unreadMessageCount = item.getUnreadMessageCount();
-            if (im.type.equals("RC:TxtMsg")) {
-              TextMessage text = (TextMessage) item.getLatestMessage();
-              im.content = text.getContent();
-            }
-            long sendTime = item.getSentTime();
-            long recvTime = item.getReceivedTime();
-            im.lastTime = sendTime>recvTime ? sendTime : recvTime;
-            list.add(im);
-          }
-        }
-        String content = JSON.toJSONString(list);
-        callbackContext.success(content);
-      }
-
-      @Override
-      public void onError(RongIMClient.ErrorCode errorCode) {
-        callbackContext.error("");
-      }
-    });
-  }
-
   public static void exit(Context context) {
     RongIM.getInstance().logout();
-
   }
 
-  public static void launchChats(Activity context,final CallbackContext callbackContext) {
-      chatsCallbackContext = callbackContext;
-    Intent intent = new Intent(context, RongTabsActivity.class);
-    context.startActivity(intent);
+  public static void startCustomerServiceChat(Activity context, String id, final CallbackContext callbackContext) {
+    chatCallbackContext = callbackContext;
+    RongIM.getInstance().startCustomerServiceChat(context, id, "在线客服", null);
   }
-
-  public static void launchChat(Activity context, String user, String title,final CallbackContext callbackContext) {
-      chatCallbackContext = callbackContext;
-    RongIM.getInstance().startPrivateChat(context, user, title);
-  }
-    
-    public static void launchSystem(Activity context, String user, String title,final CallbackContext callbackContext) {
-        chatCallbackContext = callbackContext;
-        RongIM.getInstance().startConversation(context, Conversation.ConversationType.SYSTEM, user, title);
-    }
-
-	public static void removeConversation(Activity context, String user, int type,final CallbackContext callbackContext) {
-	    RongIM.getInstance().removeConversation(Conversation.ConversationType.setValue(type), user, null);
-	}
 
 }

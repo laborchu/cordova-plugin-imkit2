@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:background="#23c2aa"
+    android:background="#ffffff"
     android:orientation="horizontal">
 
     <Button
@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:background="@null"
         android:padding="10dp"
-        android:text="返回"
         android:textSize="16dp"
         android:textColor="#FFFFFF"
         android:drawableLeft="@drawable/back_green"
@@ -25,7 +24,7 @@
         android:gravity="center"
         android:layout_weight="1"
         android:textSize="16dp"
-        android:text="会话"/>
+        android:text="镜易购客服"/>
 
     <Button
         android:layout_width="wrap_content"
