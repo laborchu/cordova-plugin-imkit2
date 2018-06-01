@@ -32,22 +32,14 @@ public class BaseUtils {
   public static CallbackContext chatsCallbackContext = null;
 
   public static void init(Context context, final CallbackContext callbackContext) {
-    Log.i("BaseUtils", "init");
     RongIM.init(context);
+    PluginResult pr = new PluginResult(PluginResult.Status.OK, "init");
+    pr.setKeepCallback(true);
+    callbackContext.sendPluginResult(pr);
     RongIM.setOnReceiveMessageListener(new RongIMClient.OnReceiveMessageListener() {
       @Override
       public boolean onReceived(Message message, int i) {
-        ImMessage im = new ImMessage();
-        im.id = message.getSenderUserId();
-        im.type = message.getObjectName();
-        im.conversationType = message.getConversationType().getValue();
-        if (im.type.equals("RC:TxtMsg")) {
-          TextMessage text = (TextMessage) message.getContent();
-          im.content = text.getContent();
-        }
-        im.lastTime = message.getReceivedTime();
-        String content = JSON.toJSONString(im);
-        PluginResult pr = new PluginResult(PluginResult.Status.OK, content);
+        PluginResult pr = new PluginResult(PluginResult.Status.OK, "msg");
         pr.setKeepCallback(true);
         callbackContext.sendPluginResult(pr);
         return false;

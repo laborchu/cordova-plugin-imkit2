@@ -16,20 +16,14 @@ CDVInvokedUrlCommand *bcmd;
 void recvFunc(NSString *content);
 void backFunc(NSString *content);
 
-@interface ImKit : CDVPlugin <RCIMClientReceiveMessageDelegate, RCConnectionStatusChangeDelegate, RCIMUserInfoDataSource>
+@interface ImKit : CDVPlugin <RCIMClientReceiveMessageDelegate, RCConnectionStatusChangeDelegate, RCIMUserInfoDataSource,RCIMReceiveMessageDelegate>
     
     //@property(nonatomic, assign) id<CDVCommandDelegate> delegate;
     //@property(nonatomic, retain) CDVInvokedUrlCommand *cmd;
     
     
-- (void)Init:(CDVInvokedUrlCommand *)command;
-- (void)Connect:(CDVInvokedUrlCommand *)command;
-- (void)LaunchChats:(CDVInvokedUrlCommand *)command;
-- (void)LaunchChat:(CDVInvokedUrlCommand *)command;
-- (void)LaunchSystem:(CDVInvokedUrlCommand *)command;
-- (void)Exit:(CDVInvokedUrlCommand *)command;
-- (void)GetUserInfo:(CDVInvokedUrlCommand *)command;
-- (void)GetConversationList:(CDVInvokedUrlCommand *)command;
-- (void)RemoveConversation:(CDVInvokedUrlCommand *)command;
+- (void)init:(CDVInvokedUrlCommand *)command;
+- (void)connect:(CDVInvokedUrlCommand *)command;
+- (void)launchCustomer:(CDVInvokedUrlCommand *)command;
 
 @end

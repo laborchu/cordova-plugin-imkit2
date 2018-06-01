@@ -9,19 +9,16 @@
 #import "ImKit.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <RongIMKit/RongIMKit.h>
-#import "RIChatViewController.h"
-#import "RongImUtls.h"
+#import "RCDCustomerServiceViewController.h"
 
 @interface ImKit()
-    @property(nonatomic, strong) RongImUtls *rongimUtls;
-    @end
+@end
 
 @implementation ImKit
     
-    @synthesize hasPendingOperation;
+@synthesize hasPendingOperation;
     
 - (instancetype)initWithWebView:(UIWebView*)theWebView {
-    NSLog(@"RongCloudLibPlugin initWithWebView");
 #ifdef __CORDOVA_4_0_0
     self = [super init];
 #else
@@ -40,61 +37,58 @@
 }
     
 # pragma mark Public methods
-    /**
-     * initialize & connection
-     */
-    
-    void recvFunc(NSString *content) {
-        CDVPluginResult *pluginResult=nil;
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
-        [pluginResult setKeepCallbackAsBool:true];
-        [delegate sendPluginResult:pluginResult callbackId:cmd.callbackId];
+
+-(void)onRCIMReceiveMessage:(RCMessage *)message left:(int)left {
+    recvFunc(@"msg");
+}
+
+void recvFunc(NSString *content) {
+    CDVPluginResult *pluginResult=nil;
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
+    [pluginResult setKeepCallbackAsBool:true];
+    [delegate sendPluginResult:pluginResult callbackId:cmd.callbackId];
+}
+
+void backFunc(NSString *content) {
+    if (bcmd == NULL) {
+        return;
     }
+    CDVPluginResult *pluginResult=nil;
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
+    [pluginResult setKeepCallbackAsBool:true];
+    [delegate sendPluginResult:pluginResult callbackId:bcmd.callbackId];
+    bcmd = NULL;
+}
     
-    void backFunc(NSString *content) {
-        if (bcmd == NULL) {
-            return;
-        }
-        CDVPluginResult *pluginResult=nil;
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
-        [pluginResult setKeepCallbackAsBool:true];
-        [delegate sendPluginResult:pluginResult callbackId:bcmd.callbackId];
-        bcmd = NULL;
+- (void)init:(CDVInvokedUrlCommand *)command{
+    delegate = self.commandDelegate;
+    cmd = command;
+    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"RCConfig" ofType:@"plist"];
+    if (plistPath != nil) {
+        NSMutableDictionary *plistData = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
+        NSString *appkey       = [plistData valueForKey:@"RONGC_APP_KEY"];
+        [[RCIM sharedRCIM] initWithAppKey:appkey];
+        [[RCIM sharedRCIM] setReceiveMessageDelegate:self];
+        recvFunc(@"init");
     }
+}
     
-- (void)Init:(CDVInvokedUrlCommand *)command
-    {
-        //1
-        NSLog(@"%s", __FUNCTION__);
-        delegate = self.commandDelegate;
-        cmd = command;
-        
-        _rongimUtls = [[RongImUtls alloc] init];
-        NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"RCConfig" ofType:@"plist"];
-        if (plistPath != nil) {
-            NSMutableDictionary *plistData = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
-            NSString *appkey       = [plistData valueForKey:@"RONGC_APP_KEY"];
-            [_rongimUtls init: appkey andSuccessFunc: recvFunc];
-        }
-    }
-    
-- (void)Connect:(CDVInvokedUrlCommand *)command {
+- (void)connect:(CDVInvokedUrlCommand *)command {
     NSString *imtoken = [command argumentAtIndex:0 withDefault:nil];
-    NSString *htoken = [command argumentAtIndex:1 withDefault:nil];
-    NSString *userUrl = [command argumentAtIndex:2 withDefault:nil];
-    [_rongimUtls connect:htoken andImToken:imtoken andGetUserUrl:userUrl success:^(NSString *content) {
-        CDVPluginResult *pluginResult=nil;
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    [[RCIM sharedRCIM] connectWithToken:imtoken success:^(NSString *userId) {
+    } error:^(RCConnectErrorCode status) {
+    } tokenIncorrect:^{
     }];
-    
 }
     
 
-- (void)LaunchCustomer:(CDVInvokedUrlCommand *)command {
-    bcmd = command;
+- (void)launchCustomer:(CDVInvokedUrlCommand *)command {
     NSString *userId = [command argumentAtIndex:0 withDefault:nil];
-    [_rongimUtls LaunchCustomer:userId success: backFunc];
+    RCDCustomerServiceViewController *chat = [[RCDCustomerServiceViewController alloc] init];
+    chat.conversationType = ConversationType_CUSTOMERSERVICE;
+    chat.targetId = userId;
+    chat.title = @"镜易购客服";
+    [self.viewController.navigationController pushViewController:chat animated:YES];
 }
 
 @end

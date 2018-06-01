@@ -201,16 +201,10 @@
           </feature>
       </config-file>
       <header-file src="src/ios/ImKit.h" target-dir="src/ios" />
-    <header-file src="src/ios/RongIm/HttpUtils.h" target-dir="src/ios" />
-    <header-file src="src/ios/RongIm/RIChatsViewController.h" target-dir="src/ios" />
-    <header-file src="src/ios/RongIm/RIChatViewController.h" target-dir="src/ios" />
-    <header-file src="src/ios/RongIm/RongImUtls.h" target-dir="src/ios" />
+    <header-file src="src/ios/RongIm/RCDCustomerServiceViewController.h" target-dir="src/ios" />
 
       <source-file src="src/ios/ImKit.m" target-dir="src/ios" />
-      <source-file src="src/ios/RongIm/HttpUtils.m" target-dir="src/ios" />
-      <source-file src="src/ios/RongIm/RIChatsViewController.m" target-dir="src/ios" />
-      <source-file src="src/ios/RongIm/RIChatViewController.m" target-dir="src/ios" />
-      <source-file src="src/ios/RongIm/RongImUtls.m" target-dir="src/ios" />
+      <source-file src="src/ios/RongIm/RCDCustomerServiceViewController.m" target-dir="src/ios" />
 
       <framework src="src/ios/RongIm/RongIMKit.framework" custom="true" />
       <resource-file src="src/ios/RongIm/RongCloud.bundle" />
